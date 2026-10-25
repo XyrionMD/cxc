@@ -1,6 +1,6 @@
 #!/bin/python3
 
-import sys, datetime, shutil, subprocess
+import sys, datetime
 
 from pathlib import Path
 
@@ -14,15 +14,13 @@ CVT = load_config()
 
 arg = sys.argv[1:]
 
-mpv_process = None
-
 MUSIC_DIR = Path.home() / CVT.MUSIC_DIR
 MUSIC_DIR.mkdir(parents=True, exist_ok=True)
 
 VIDEO_DIR = Path.home() / CVT.VIDEO_DIR
 VIDEO_DIR.mkdir(parents=True, exist_ok=True)
 
-Version = "1.0.0 Stable"
+Version = "1.1.0"
 
 
 def show_help():
@@ -113,7 +111,6 @@ def show_time():
 
 
 def main():
-    global mpv_process
     match arg:
         case ["download"] | ["-D"] | ["download", "--help"] | ["download", "-h"]:
             show_help_download()
@@ -128,7 +125,7 @@ def main():
             video_dowloader(query, quality)
 
         case ["update"] | ["-U"]:
-            update_OTA()
+            update_OTA(Version)
 
         case ["mpx", "--help"] | ["mpx", "-h"]:
             show_help_play()
@@ -167,5 +164,9 @@ def main():
         case _:
             print("Command Not Found")
             show_help()
+
+
+if __name__ == "__main__":
+    main()
 
 

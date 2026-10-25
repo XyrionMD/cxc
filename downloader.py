@@ -1,4 +1,4 @@
-import yt_dlp, io, contextlib, time, shutil, os, subprocess
+import yt_dlp, io, contextlib, time, os, requests
 from colors import C
 from pathlib import Path
 
@@ -146,12 +146,8 @@ def download(query):
 
                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                    ydl.download([url])
-               cmd = input("Do You Play It? [y/n] ").lower()
-
-               if cmd == "y":
-                 cmd_args = ["mpv", "--no-video", MUSIC_DIR / xcv] + [".mp3"]
-                 final_args = cmd_args[:2] + [str(cmd_args[2]) + cmd_args[3]]
-                 subprocess.Popen(final_args)
+               print(f"Downloaded: {xcv}")
+               print("Play it with mpx: cxc mpx")
 
    except yt_dlp.utils.DownloadError:
         print("Connection Timeout")
@@ -177,16 +173,27 @@ def video_dowloader(query, quality):
         print("Connection Timeout")
         return
 
-def update_OTA():
-    ota = os.system("pipx upgrade cxc")
+def update_OTA(Version):
+    url = "https://pypi.org/pypi/cxc/json"
 
-    if ota != 0:
-        os.system("clear")
-        print("[Error] Failed to upgrade cxc")
-        answer = input("Try again now? [y/n]: ")
+    try:
+        respon = requests.get(url)
+        respon.raise_for_status()
 
-        if answer == "y":
-            print("accepted...")
-            os.system("pipx upgrade cxc")
+        data_json = respon.json()
+        new_version = data_json['info']['version']
+
+        if Version == new_version:
+            print("Latest version:" ,Version)
         else:
-            return
+            print("Update Avaible Version:" ,new_version)
+            cmd = input("Update now?[y/n]").lower().strip()
+            if cmd == "y":
+                print("Please Wait...")
+                time.sleep(1)
+                os.system("pipx upgrade cxc")
+            else:
+                print("aborted.")
+
+    except requests.exceptions.RequestException:
+        print("Failed to fetch latest version from PyPI. Please check your internet connection.")

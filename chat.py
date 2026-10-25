@@ -1,4 +1,4 @@
-import os, requests, shlex
+import requests
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical, ScrollableContainer, Center
 from textual.widgets import Header, Footer, Input, Static, Markdown
