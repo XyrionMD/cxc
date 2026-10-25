@@ -1,65 +1,138 @@
-**CodeX Core CXC**
+# CodeX Core (cxc)
 
-Hello everyone, my name is Rion. This is my boredom project, which might be useful for you. This tool has several features such as:
+[![PyPI version](https://img.shields.io/pypi/v/cxc.svg)](https://pypi.org/project/cxc)
+[![Python Version](https://img.shields.io/pypi/pyversions/cxc.svg)](https://pypi.org/project/cxc)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub](https://img.shields.io/badge/GitHub-XyrionMD%2Fcxc-blue.svg)](https://github.com/XyrionMD/cxc)
 
-**Features**
+A feature-rich command-line tool for music/video downloading, local media management, AI chat, and interactive playback — all in one lightweight package.
 
-- Download Music with yt-dlp
-- Search Music with yt-dlp
-- Video Downloader (DV)
-- Local Search
-- mpx Music Player X (VLC / mpv)
-- AI Chat
-- Self Update (checks PyPI, upgrades via pipx)
+**GitHub:** https://github.com/XyrionMD/cxc  
+**PyPI:** https://pypi.org/project/cxc
 
-**How to use**
+---
 
+## ✨ Features
+
+| Feature | Description |
+|---------|-------------|
+| 🎵 **Music Search & Download** | Search YouTube and download audio as MP3 (192 kbps) |
+| 🎬 **Video Downloader (DV)** | Download videos at chosen resolutions (e.g., 360p, 720p, 1080p) |
+| 🔍 **Local Search** | Find downloaded files with fuzzy/typo-tolerant matching |
+| 🎧 **mpx (Music Player X)** | Interactive TUI player with VLC backend (full controls) and mpv fallback |
+| 🤖 **AI Chat** | Terminal-based chat UI powered by Google Gemini API (Textual TUI) |
+| ⏰ **Time Utility** | Display current time, day, month, and year |
+| 🔄 **Self Update** | Checks PyPI for latest version and upgrades via `pipx` |
+| ⚙️ **TOML Config** | Clean `~/.config/cxc/config.toml` with auto-migration from legacy `config.py` |
+
+---
+
+## 📦 Installation
+
+### Via pipx (Recommended)
+```bash
+pipx install cxc
 ```
+
+### Via pip
+```bash
+pip install cxc
+```
+
+> **Requirements:** Python 3.11+, `ffmpeg` (for audio conversion), and optionally `libvlc` (for full mpx controls) or `mpv` (fallback).
+
+---
+
+## 🚀 Quick Start
+
+```bash
+# First run creates config at ~/.config/cxc/config.toml
 cxc help
+
+# Set your Gemini API key for chat
+nano ~/.config/cxc/config.toml
+
+# Search and download music
+cxc download "your favorite song"
+
+# Play it with mpx
+cxc mpx
 ```
 
-**Commands**
+---
 
-| Command                        | Alias | Description                          |
-| ------------------------------ | ----- | ------------------------------------ |
-| `cxc search "<title>"`         | `-S`  | Search music information             |
-| `cxc search --local "<title>"` |       | Search your downloaded files locally |
-| `cxc download "<title>"`       | `-D`  | Search and download music to MP3     |
-| `cxc DV -r "<res>" "<URL>"`    |       | Download a video at a chosen quality |
-| `cxc mpx`                      |       | Open Music Player X                  |
-| `cxc chat`                     |       | Open the AI chat menu                |
-| `cxc time`                     | `-t`  | Show time, day, month, and year      |
-| `cxc update`                   | `-U`  | Check PyPI and update via `pipx`     |
-| `cxc version`                  | `-v`  | Show the current version             |
-| `cxc help`                     | `h`   | Display the help menu                |
+## 📖 Commands Reference
 
-**mpx (Music Player X)**
+| Command | Alias | Description |
+|---------|-------|-------------|
+| `cxc search "<title>"` | `-S` | Search YouTube for music info |
+| `cxc search --local "<title>"` | | Search downloaded files locally (fuzzy) |
+| `cxc download "<title>"` | `-D` | Search and download music as MP3 |
+| `cxc DV -r "<res>" "<URL>"` | | Download video at resolution (e.g., `360`, `720`, `1080`) |
+| `cxc mpx` | | Open Music Player X (interactive) |
+| `cxc chat` | | Open AI chat (requires API key in config) |
+| `cxc time` | `-t` | Show current time, day, month, year |
+| `cxc update` | `-U` | Check PyPI and upgrade via `pipx` |
+| `cxc version` | `-v` | Show current version |
+| `cxc help` | `h` | Display help menu |
 
-`cxc mpx` opens an interactive player. It uses **python-vlc** when available and automatically falls back to **mpv** otherwise.
+---
 
-| Command           | Description                       |
-| ----------------- | --------------------------------- |
-| `play <n>`        | Play track number `<n>`           |
-| `play all`        | Play every track in the folder    |
-| `play <filename>` | Play a file by name               |
-| `pause`           | Pause / resume                    |
-| `resume`          | Resume playback                   |
-| `stop`            | Stop playback                     |
-| `next` / `prev`   | Next / previous track             |
-| `volume <0-100>`  | Set volume (no argument shows it) |
-| `now`             | Show the current track            |
-| `list`            | List all tracks                   |
-| `help`            | Show the mpx help                 |
-| `quit`            | Exit mpx                          |
+## 🎧 mpx — Music Player X
 
-> Note: python-vlc needs the native **libvlc** library. On systems without it, `cxc mpx` falls back to **mpv** (with limited controls: no pause/next/prev/volume).
+`cxc mpx` launches an interactive music player. It prefers **python-vlc** (full controls: pause, next/prev, volume) and falls back to **mpv** (play/stop only) if libvlc isn't available.
 
-**Configuration**
+### mpx Commands
 
-cxc stores its settings in `~/.config/cxc/config.toml` (TOML format). The file is created automatically on first run — just edit it and restart cxc.
+| Command | Description |
+|---------|-------------|
+| `play <n>` | Play track number `n` |
+| `play all` | Play all tracks in order |
+| `play <filename>` | Play a specific file by name |
+| `pause` / `resume` | Pause or resume playback |
+| `stop` | Stop playback |
+| `next` / `prev` | Next or previous track |
+| `volume <0-100>` | Set volume (no argument shows current) |
+| `now` | Show currently playing track |
+| `list` / `ls` | List all tracks |
+| `help` / `h` | Show help |
+| `quit` / `q` | Exit mpx |
+
+> **Note:** Install `vlc` (with `libvlc` headers) for the best experience. On Debian/Ubuntu: `sudo apt install vlc libvlc-dev`. On Arch: `sudo pacman -S vlc`.
+
+---
+
+## 🤖 AI Chat
+
+`cxc chat` opens a beautiful Textual TUI for chatting with Google Gemini.
+
+### Setup
+
+1. Get a Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey)
+2. Edit `~/.config/cxc/config.toml`:
+   ```toml
+   API = "your-gemini-api-key"
+   MODEL = "gemini-2.5-flash"   # or your preferred model
+   AI_NAME = "CodeX"
+   AI_PROMPT = "You Are {AI_NAME}"
+   ```
+3. Run `cxc chat`
+
+### Chat Controls
+- **Type message + Enter** — Send
+- **`quit`** — Exit chat
+- **`help`** / **Ctrl+H** — Show help modal
+- **Ctrl+Q** — Quit immediately
+
+---
+
+## ⚙️ Configuration
+
+Config file: `~/.config/cxc/config.toml` (created automatically on first run, permissions `600`).
 
 ```toml
 # CodeX Core (cxc) configuration
+# Edit this file then restart cxc.
 
 # --- AI credentials ---
 API = "PASTE_YOUR_API_KEY"
@@ -73,50 +146,118 @@ MUSIC_DIR = "Music"
 VIDEO_DIR = "Videos"
 ```
 
-| Key         | Description                                                       |
-| ----------- | ----------------------------------------------------------------- |
-| `API`       | Your Gemini API key (required for `cxc chat`).                    |
-| `MODEL`     | The AI model to use, e.g. `gemini-2.5-flash`.                     |
-| `AI_NAME`   | The name shown for the AI in chat.                                |
-| `AI_PROMPT` | The system prompt. May reference other keys, e.g. `{AI_NAME}`.    |
-| `MUSIC_DIR` | Folder for downloaded music, relative to your home directory.     |
-| `VIDEO_DIR` | Folder for downloaded videos, relative to your home directory.    |
+| Key | Description |
+|-----|-------------|
+| `API` | Gemini API key (required for `cxc chat`) |
+| `MODEL` | AI model to use (e.g., `gemini-2.5-flash`) |
+| `AI_NAME` | Display name for the AI in chat |
+| `AI_PROMPT` | System prompt; can reference `{AI_NAME}` |
+| `MUSIC_DIR` | Folder for downloaded music (relative to `$HOME`) |
+| `VIDEO_DIR` | Folder for downloaded videos (relative to `$HOME`) |
 
-**Config format & migration**
+### Migration from Old Versions
 
-The configuration format changed from a Python file (`config.py`) to **TOML** (`config.toml`). You don't need to do anything manually:
+If you're upgrading from a version that used `~/.config/cxc/config.py`, cxc automatically:
+1. Reads the old `config.py`
+2. Writes the new `config.toml`
+3. Backs up the old file as `config.py.bak`
+4. Removes the legacy `.lock` file
 
-- If you upgrade from an old version, cxc migrates automatically the first time you run it:
-  1. reads your old `config.py`,
-  2. writes the new `config.toml`,
-  3. keeps a backup of the old file as `config.py.bak`,
-  4. removes the old `.lock` file.
-- Your API key and all other settings are preserved.
-- If you have no old config, a fresh `config.toml` is created for you.
-- The file is stored with owner-only permissions (`600`) because it holds your API key.
-- cxc now requires **Python 3.11+** (for the built-in `tomllib`).
+Your API key and settings are preserved.
 
-**Update**
+---
 
-## What's New in v1.1.0
+## 🔄 Self Update
 
-- **Smarter `cxc update`** — the updater now checks PyPI for the latest release and only offers to upgrade when a newer version exists, instead of always running `pipx upgrade`.
-- **Download hands off to mpx** — after a download finishes, cxc prints the saved track name and points you to `cxc mpx` to play it, instead of spawning a separate mpv player.
-- **Cleanup** — removed leftover mpv playback code and unused imports from `cxc.py`, `downloader.py`, and `chat.py`.
+```bash
+cxc update
+# or
+cxc -U
+```
 
-## What's New in v1.0.0 (First Stable Release)
+Checks PyPI for the latest version. If a newer version exists, prompts to run `pipx upgrade cxc`.
 
-- **Video Downloader (DV)** — download videos with yt-dlp and pick the resolution, e.g. `cxc DV -r "360" "<URL>"`.
-- **Self Update** — update cxc straight from the terminal using `pipx upgrade`, e.g. `cxc update`.
-- **Local Search** — find your downloaded music/videos on your device with partial-title and typo-tolerant matching, e.g. `cxc search --local "<music title>"`.
-- **New config format** — configuration moved from `config.py` to `config.toml`, with automatic migration from the old file. See the [Configuration](#configuration) section.
-- **VLC-based mpx** — the music player now uses `python-vlc` with full playback controls (pause, next/prev, volume), with an automatic `mpv` fallback.
-- **pyproject.toml** — packaging moved from `setup.py` to the modern `pyproject.toml` standard.
+---
 
-**Notes**
+## 📋 Requirements
 
-- Before using the chat feature, please set your configuration first in `~/.config/cxc/config.toml` (see [Configuration](#configuration)).
-- The current stable release is **v1.1.0**.
-- The `1.26.x` versions were the **nightly** channel. **v1.0.0 is the first stable release** of CXC, so the versioning restarts from here.
+| Dependency | Purpose |
+|------------|---------|
+| Python 3.11+ | Core runtime (requires `tomllib`) |
+| `yt-dlp` | Video/audio downloading |
+| `ffmpeg` | Audio conversion to MP3 |
+| `python-vlc` + `libvlc` | Full-featured mpx backend (recommended) |
+| `mpv` | Fallback mpx backend |
+| `textual` | TUI for AI chat |
+| `requests` | HTTP requests (AI chat, update check) |
+| `rapidfuzz` | Optional: faster fuzzy local search |
 
-I will update regularly but I can't guarantee it, so see you in the next update.
+Install system dependencies:
+```bash
+# Debian/Ubuntu
+sudo apt install ffmpeg vlc libvlc-dev mpv
+
+# Arch
+sudo pacman -S ffmpeg vlc mpv
+
+# Fedora
+sudo dnf install ffmpeg vlc vlc-devel mpv
+```
+
+---
+
+## 📁 Project Structure
+
+```
+cxc/
+├── cxc.py           # Main entry point & command dispatch
+├── downloader.py    # Search, download, video download, local search, update
+├── chat.py          # AI chat TUI (Textual + Gemini API)
+├── mpx.py           # Music Player X (VLC/mpv backends)
+├── config_loader.py # TOML config with legacy migration
+├── colors.py        # ANSI color constants
+├── pyproject.toml   # Packaging metadata
+├── LICENSE          # MIT License
+└── README.md        # This file
+```
+
+---
+
+## 📝 Changelog
+
+### v1.1.0 (Current)
+- Smarter `cxc update`: checks PyPI and only prompts when a newer version exists
+- Download now hands off to `cxc mpx` instead of spawning separate mpv
+- Code cleanup: removed unused imports and leftover mpv playback code
+
+### v1.0.0 (First Stable Release)
+- Video Downloader (DV) with resolution selection
+- Self-update via `pipx`
+- Local search with fuzzy matching
+- Config migration from `config.py` → `config.toml`
+- VLC-based mpx with full playback controls
+- Modern `pyproject.toml` packaging
+
+> **Note:** Versions `1.26.x` were the nightly channel. **v1.0.0 is the first stable release**, so versioning restarts from here.
+
+---
+
+## 📄 License
+
+MIT License — see [LICENSE](LICENSE) for details.
+
+Copyright (c) 2026 [Xyrion](https://github.com/XyrionMD)
+
+---
+
+## 👤 Author
+
+**Rion (XyrionMD)**  
+GitHub: [@XyrionMD](https://github.com/XyrionMD)  
+PyPI: [cxc](https://pypi.org/project/cxc)
+
+---
+
+<p align="center">
+  Made with boredom and Python 🐍
+</p>
