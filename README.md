@@ -3,7 +3,6 @@
 [![PyPI version](https://img.shields.io/pypi/v/cxc.svg)](https://pypi.org/project/cxc)
 [![Python Version](https://img.shields.io/pypi/pyversions/cxc.svg)](https://pypi.org/project/cxc)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub](https://img.shields.io/badge/GitHub-XyrionMD%2Fcxc-blue.svg)](https://github.com/XyrionMD/cxc)
 
 A feature-rich command-line tool for music/video downloading, local media management, AI chat, and interactive playback — all in one lightweight package.
 
