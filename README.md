@@ -245,7 +245,7 @@ cxc/
 
 MIT License — see [LICENSE](LICENSE) for details.
 
-Copyright (c) 2026 [Xyrion](https://github.com/XyrionMD)
+Copyright (c) 2026 [XyrionMD](https://github.com/XyrionMD)
 
 ---
 
