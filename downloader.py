@@ -1,8 +1,8 @@
-import yt_dlp, io, contextlib, time, os, requests
+import yt_dlp, io, contextlib, time, os, requests, shutil
 from colors import C
 from pathlib import Path
 
-from config_loader import load_config
+from config_loader import load_config, debug_mode
 
 CVT = load_config()
 
@@ -40,6 +40,13 @@ ydl_opts = {
     'outtmpl': str(MUSIC_DIR / '%(title)s.%(ext)s'),
 }
 
+def check_ffmpeg():
+    if shutil.which("ffmpeg") is not None:
+        print("Connection Timeout")
+    else:
+        print("ffmpeg Not Installed")
+        print("Fallback To WebM Format.")
+
 def search(query):
    try:
        with QuietYDL(ydl_opts) as ydl:
@@ -64,8 +71,11 @@ def search(query):
                print(f"{C.BLUE}Channel: {nameC}{C.RESET}")
                print(f"{C.GREEN}Video Duration: {minute}:{second}{C.RESET}")
                print(f"{C.GREEN}Short description: {description}{C.RESET}")
-   except yt_dlp.utils.DownloadError:
-         print("Connection Timeout")
+   except yt_dlp.utils.DownloadError as e:
+        if (CVT.DEBUG) == True:
+            debug_mode(e)
+        else:
+            check_ffmpeg()
 
 
 def local_search(query):
@@ -149,8 +159,11 @@ def download(query):
                print(f"Downloaded: {xcv}")
                print("Play it with mpx: cxc mpx")
 
-   except yt_dlp.utils.DownloadError:
-        print("Connection Timeout")
+   except yt_dlp.utils.DownloadError as e:
+        if (CVT.DEBUG) == True:
+            debug_mode(e)
+        else:
+            check_ffmpeg()
         return
 
 def video_dowloader(query, quality):
@@ -169,8 +182,11 @@ def video_dowloader(query, quality):
         with yt_dlp.YoutubeDL(opts) as ydl:
             ydl.download([query])
 
-    except yt_dlp.utils.DownloadError:
-        print("Connection Timeout")
+    except yt_dlp.utils.DownloadError as e:
+        if (CVT.DEBUG) == True:
+            debug_mode(e)
+        else:
+            print("Connection Timeout")
         return
 
 def update_OTA(Version):
@@ -195,5 +211,8 @@ def update_OTA(Version):
             else:
                 print("aborted.")
 
-    except requests.exceptions.RequestException:
-        print("Failed to fetch latest version from PyPI. Please check your internet connection.")
+    except requests.exceptions.RequestException as e:
+        if (CVT.DEBUG) == True:
+            debug_mode(e)
+        else:
+            print("Failed to fetch latest version from PyPI. Please check your internet connection.")

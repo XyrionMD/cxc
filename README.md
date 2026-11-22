@@ -18,11 +18,16 @@ A feature-rich command-line tool for music/video downloading, local media manage
 | 🎵 **Music Search & Download** | Search YouTube and download audio as MP3 (192 kbps) |
 | 🎬 **Video Downloader (DV)** | Download videos at chosen resolutions (e.g., 360p, 720p, 1080p) |
 | 🔍 **Local Search** | Find downloaded files with fuzzy/typo-tolerant matching |
-| 🎧 **mpx (Music Player X)** | Interactive TUI player with VLC backend (full controls) and mpv fallback |
+| 🎧 **mpx (Music Player X)** | Interactive player with VLC backend (full controls) and mpv fallback |
 | 🤖 **AI Chat** | Terminal-based chat UI powered by Google Gemini API (Textual TUI) |
+| 🖼️ **File & Image to AI** | Send images (JPG/PNG/WebP) or text files to Gemini with `/file` |
+| 🎨 **Textual Themes** | Pick a chat theme from Textual's built-in themes, saved automatically |
+| 🩺 **System State** | Inspect distro, kernel, FFmpeg, API key, Python/venv and config status |
+| 🛠️ **Config CLI** | View, edit, reset and set config values without leaving the terminal |
+| 🐞 **Debug Mode** | Optional verbose error output for chat, downloads and update checks |
 | ⏰ **Time Utility** | Display current time, day, month, and year |
 | 🔄 **Self Update** | Checks PyPI for latest version and upgrades via `pipx` |
-| ⚙️ **TOML Config** | Clean `~/.config/cxc/config.toml` with auto-migration from legacy `config.py` |
+| ⚙️ **TOML Config** | Sectioned `~/.config/cxc/config.toml` with auto-migration from legacy `config.py` |
 
 ---
 
@@ -48,14 +53,17 @@ pip install cxc
 # First run creates config at ~/.config/cxc/config.toml
 cxc help
 
-# Set your Gemini API key for chat
-nano ~/.config/cxc/config.toml
+# Set your Gemini API key without opening an editor
+cxc config set API "your-gemini-api-key"
 
 # Search and download music
 cxc download "your favorite song"
 
 # Play it with mpx
 cxc mpx
+
+# Check your setup
+cxc state
 ```
 
 ---
@@ -70,10 +78,65 @@ cxc mpx
 | `cxc DV -r "<res>" "<URL>"` | | Download video at resolution (e.g., `360`, `720`, `1080`) |
 | `cxc mpx` | | Open Music Player X (interactive) |
 | `cxc chat` | | Open AI chat (requires API key in config) |
+| `cxc state` | | Display current system and config state |
+| `cxc about` | | Show information about cxc |
+| `cxc config <subcommand>` | | Manage configuration (see below) |
 | `cxc time` | `-t` | Show current time, day, month, year |
 | `cxc update` | `-U` | Check PyPI and upgrade via `pipx` |
 | `cxc version` | `-v` | Show current version |
-| `cxc help` | `h` | Display help menu |
+| `cxc help` | `h`, `--help`, `-h` | Display help menu |
+
+> Most commands also accept `--help` / `-h` for a short usage hint, e.g. `cxc download --help`, `cxc DV -h`, `cxc mpx --help`, `cxc chat --help`, `cxc search --help`.
+
+---
+
+## 🛠️ Configuration Management
+
+Use `cxc config` to manage `~/.config/cxc/config.toml` directly:
+
+| Subcommand | Description |
+|------------|-------------|
+| `cxc config path` | Print the config directory path |
+| `cxc config edit` | Open the config in `$EDITOR`, `nano`, `vim`, `nvim`, or `vi` |
+| `cxc config reset` | Restore all defaults (⚠️ wipes your API key) |
+| `cxc config set <KEY> <VALUE>` | Update a single key in place |
+| `cxc config list-theme` | List all available Textual themes |
+| `cxc config help` | Show the config help menu |
+
+Examples:
+
+```bash
+cxc config set API "AIza..."
+cxc config set THEME "dracula"
+cxc config set DEBUG true
+cxc config list-theme
+```
+
+If the TOML file is malformed, cxc won't crash on startup: it prints the parse error and asks you to run `cxc config edit` (fix manually) or `cxc config reset` (restore defaults). Back up your API key before resetting.
+
+---
+
+## 🩺 System State
+
+`cxc state` prints a diagnostic snapshot:
+
+```text
+===========================================
+CXC STATE...
+===========================================
+Distro      : Arch Linux
+ID          : arch
+Kernel      : 6.x.x-arch1-1
+FFmpeg      : Installed
+APIKEY      : Active
+Python3     : /usr/bin/python3 (3-11-9)
+Env         : system
+Config Mode : 0o600 (Secure)
+Config DIR  : /home/you/.config/cxc/config.toml
+Music  DIR  : /home/you/Music
+```
+
+It reports FFmpeg availability, API key status, Python executable/version, whether you're inside a virtual environment, and whether the config file has secure `600` permissions.
 
 ---
 
@@ -97,31 +160,52 @@ cxc mpx
 | `help` / `h` | Show help |
 | `quit` / `q` | Exit mpx |
 
-> **Note:** Install `vlc` (with `libvlc` headers) for the best experience. On Debian/Ubuntu: `sudo apt install vlc libvlc-dev`. On Arch: `sudo pacman -S vlc`.
+> **Note:** Install `vlc` (with `libvlc` headers) for the best experience. The mpv fallback works for play/stop but prints a notice for unsupported controls. On Debian/Ubuntu: `sudo apt install vlc libvlc-dev`. On Arch: `sudo pacman -S vlc`.
 
 ---
 
 ## 🤖 AI Chat
 
-`cxc chat` opens a beautiful Textual TUI for chatting with Google Gemini.
+`cxc chat` opens a Textual TUI for chatting with Google Gemini. Conversations keep their history for the whole session and are sent with your `AI_PROMPT` as the system instruction.
 
 ### Setup
 
 1. Get a Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey)
-2. Edit `~/.config/cxc/config.toml`:
+2. Edit `~/.config/cxc/config.toml` (or use `cxc config set ...`):
    ```toml
+   [ai]
    API = "your-gemini-api-key"
-   MODEL = "gemini-2.5-flash"   # or your preferred model
-   AI_NAME = "CodeX"
+   MODEL = "gemini-2.5-flash"
    AI_PROMPT = "You Are {AI_NAME}"
    ```
 3. Run `cxc chat`
 
 ### Chat Controls
+
 - **Type message + Enter** — Send
+- **`help`** / **Ctrl+H** — Show help modal (**ESC** closes it)
 - **`quit`** — Exit chat
-- **`help`** / **Ctrl+H** — Show help modal
 - **Ctrl+Q** — Quit immediately
+
+### Sending Files to the AI
+
+Use `/file <path> <prompt>` inside the chat:
+
+```text
+/file ~/photo.png What do you see here?
+/file ./notes.txt Summarize this for me.
+```
+
+- Supported image types: `.jpg`, `.jpeg`, `.png`, `.webp` — sent inline as base64 (vision).
+- Other files are read as UTF-8 text and appended to the prompt.
+- `~` is expanded automatically; missing files are reported in chat.
+- If you omit the prompt, it defaults to `Analyze this file.`
+
+### Appearance & Debugging
+
+- `THEME` sets the Textual theme on startup (default: `catppuccin-mocha`). Changing the theme in-app is saved back to the config automatically. Run `cxc config list-theme` to see valid names.
+- `LOADING_STYLES` controls the style of the animated "typing..." indicator (default: `#`).
+- `DEBUG = true` prints verbose error details in chat, downloads, and update checks. Leave it off for normal use.
 
 ---
 
@@ -129,36 +213,47 @@ cxc mpx
 
 Config file: `~/.config/cxc/config.toml` (created automatically on first run, permissions `600`).
 
+Settings are grouped into sections:
+
 ```toml
 # CodeX Core (cxc) configuration
 # Edit this file then restart cxc.
 
-# --- AI credentials ---
+[ai]
 API = "PASTE_YOUR_API_KEY"
 MODEL = "gemini-2.5-flash"
-AI_NAME = "Your_Ai_Name"
-# AI_PROMPT may reference other keys, e.g. {AI_NAME}
 AI_PROMPT = "You Are {AI_NAME}"
 
-# --- Folders (relative to your home directory) ---
+[appearance]
+LOADING_STYLES = "#"
+AI_NAME = "Your_Ai_Name"
+THEME = "catppuccin-mocha"
+
+[settings]
+DEBUG = false
+
+[folders]
 MUSIC_DIR = "Music"
 VIDEO_DIR = "Videos"
 ```
 
-| Key | Description |
-|-----|-------------|
-| `API` | Gemini API key (required for `cxc chat`) |
-| `MODEL` | AI model to use (e.g., `gemini-2.5-flash`) |
-| `AI_NAME` | Display name for the AI in chat |
-| `AI_PROMPT` | System prompt; can reference `{AI_NAME}` |
-| `MUSIC_DIR` | Folder for downloaded music (relative to `$HOME`) |
-| `VIDEO_DIR` | Folder for downloaded videos (relative to `$HOME`) |
+| Section | Key | Description |
+|---------|-----|-------------|
+| `[ai]` | `API` | Gemini API key (required for `cxc chat`) |
+| `[ai]` | `MODEL` | AI model to use (e.g., `gemini-2.5-flash`) |
+| `[ai]` | `AI_PROMPT` | System prompt; can reference `{AI_NAME}` |
+| `[appearance]` | `LOADING_STYLES` | Textual style used by the chat typing indicator |
+| `[appearance]` | `AI_NAME` | Display name for the AI in chat |
+| `[appearance]` | `THEME` | Textual theme name (`cxc config list-theme`) |
+| `[settings]` | `DEBUG` | Verbose error output when `true` |
+| `[folders]` | `MUSIC_DIR` | Folder for downloaded music (relative to `$HOME`) |
+| `[folders]` | `VIDEO_DIR` | Folder for downloaded videos (relative to `$HOME`) |
 
 ### Migration from Old Versions
 
 If you're upgrading from a version that used `~/.config/cxc/config.py`, cxc automatically:
 1. Reads the old `config.py`
-2. Writes the new `config.toml`
+2. Writes the new, sectioned `config.toml` (including default theme/debug values)
 3. Backs up the old file as `config.py.bak`
 4. Removes the legacy `.lock` file
 
@@ -187,7 +282,7 @@ Checks PyPI for the latest version. If a newer version exists, prompts to run `p
 | `ffmpeg` | Audio conversion to MP3 |
 | `python-vlc` + `libvlc` | Full-featured mpx backend (recommended) |
 | `mpv` | Fallback mpx backend |
-| `textual` | TUI for AI chat |
+| `textual` | TUI for AI chat + built-in theme list |
 | `requests` | HTTP requests (AI chat, update check) |
 | `rapidfuzz` | Optional: faster fuzzy local search |
 
@@ -211,11 +306,11 @@ sudo dnf install ffmpeg vlc vlc-devel mpv
 cxc/
 ├── cxc.py           # Main entry point & command dispatch
 ├── downloader.py    # Search, download, video download, local search, update
-├── chat.py          # AI chat TUI (Textual + Gemini API)
+├── chat.py          # AI chat TUI (Textual + Gemini API, /file support)
 ├── mpx.py           # Music Player X (VLC/mpv backends)
-├── config_loader.py # TOML config with legacy migration
+├── config_loader.py # Sectioned TOML config, migration, config CLI helpers
+├── statelib.py      # System/config state report for `cxc state`
 ├── colors.py        # ANSI color constants
-├── pyproject.toml   # Packaging metadata
 ├── LICENSE          # MIT License
 └── README.md        # This file
 ```
@@ -224,7 +319,16 @@ cxc/
 
 ## 📝 Changelog
 
-### v1.1.0 (Current)
+### v2.0.1 (Current)
+- New `cxc state` command with distro, kernel, FFmpeg, API key, Python/venv and config permission info
+- New `cxc config` CLI: `path`, `edit`, `reset`, `set`, `list-theme`
+- New `cxc about` command and per-command `--help` hints
+- Config moved to sections (`[ai]`, `[appearance]`, `[settings]`, `[folders]`) with new `THEME`, `LOADING_STYLES` and `DEBUG` keys
+- Chat: `/file <path> <prompt>` for images (JPG/PNG/WebP) and text files, plus animated typing indicator
+- Chat themes are loaded from config and saved back when changed; malformed TOML now shows a recovery hint instead of crashing
+- Optional debug mode for verbose errors across chat, downloads and updates
+
+### v1.1.0
 - Smarter `cxc update`: checks PyPI and only prompts when a newer version exists
 - Download now hands off to `cxc mpx` instead of spawning separate mpv
 - Code cleanup: removed unused imports and leftover mpv playback code
@@ -235,7 +339,7 @@ cxc/
 - Local search with fuzzy matching
 - Config migration from `config.py` → `config.toml`
 - VLC-based mpx with full playback controls
-- Modern `pyproject.toml` packaging
+- Modern packaging
 
 > **Note:** Versions `1.26.x` were the nightly channel. **v1.0.0 is the first stable release**, so versioning restarts from here.
 
