@@ -18,7 +18,7 @@ MUSIC_DIR.mkdir(parents=True, exist_ok=True)
 VIDEO_DIR = Path.home() / CVT.VIDEO_DIR
 VIDEO_DIR.mkdir(parents=True, exist_ok=True)
 
-Version = "2.0.1"
+Version = "2.0.2"
 
 
 def show_help():

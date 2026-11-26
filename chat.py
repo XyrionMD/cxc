@@ -13,7 +13,7 @@ style = CVT.LOADING_STYLES
 
 API_KEY = f"{CVT.API}"
 MODEL_AI = f"{CVT.MODEL}"
-URL = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL_AI}:generateContent?key={API_KEY}"
+URL = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL_AI}:generateContent"
 
 history = []
 
@@ -273,7 +273,10 @@ class CodeX(App):
             },
             "contents": history
         }
-        headers = {"Content-Type": "application/json"}
+        headers = {
+            "Content-Type": "application/json",
+            "x-goog-api-key": API_KEY
+        }
         try:
             response = requests.post(URL, json=payload, headers=headers)
             response.raise_for_status()

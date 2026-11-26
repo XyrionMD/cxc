@@ -20,6 +20,7 @@ A feature-rich command-line tool for music/video downloading, local media manage
 | 🔍 **Local Search** | Find downloaded files with fuzzy/typo-tolerant matching |
 | 🎧 **mpx (Music Player X)** | Interactive player with VLC backend (full controls) and mpv fallback |
 | 🤖 **AI Chat** | Terminal-based chat UI powered by Google Gemini API (Textual TUI) |
+| 🔐 **Private API Requests** | Gemini API key travels in the `x-goog-api-key` header, never in the URL |
 | 🖼️ **File & Image to AI** | Send images (JPG/PNG/WebP) or text files to Gemini with `/file` |
 | 🎨 **Textual Themes** | Pick a chat theme from Textual's built-in themes, saved automatically |
 | 🩺 **System State** | Inspect distro, kernel, FFmpeg, API key, Python/venv and config status |
@@ -180,6 +181,8 @@ It reports FFmpeg availability, API key status, Python executable/version, wheth
    ```
 3. Run `cxc chat`
 
+> Your API key is sent in the `x-goog-api-key` request header — it is never part of the URL, so connection errors and debug output can't expose it.
+
 ### Chat Controls
 
 - **Type message + Enter** — Send
@@ -319,7 +322,11 @@ cxc/
 
 ## 📝 Changelog
 
-### v2.0.1 (Current)
+### v2.0.2 (Current)
+- Gemini API key now sent via the `x-goog-api-key` header instead of the URL query string, so error messages can't leak it
+- Version bumped to `2.0.2`
+
+### v2.0.1
 - New `cxc state` command with distro, kernel, FFmpeg, API key, Python/venv and config permission info
 - New `cxc config` CLI: `path`, `edit`, `reset`, `set`, `list-theme`
 - New `cxc about` command and per-command `--help` hints
@@ -349,7 +356,7 @@ cxc/
 
 MIT License — see [LICENSE](LICENSE) for details.
 
-Copyright (c) 2026 [XyrionMD](https://github.com/XyrionMD)
+Copyright (c) 2026 [Xyrion](https://github.com/XyrionMD)
 
 ---
 
